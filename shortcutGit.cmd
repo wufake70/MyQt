@@ -4,7 +4,7 @@ color 2
 git lfs track "*.idb"
 git add .
 git commit . -m"%date% %time%"
-git push origin master
+git push origin main
 set /p input=Go to Git[Y/N]:
 
 if "%input%"=="y" (goto GoToGit)
