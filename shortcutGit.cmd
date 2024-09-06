@@ -15,7 +15,7 @@ pause > nul
 exit
 
 :GoToGit
-start https://github.com/wufake70/myQt
+start https://github.com/wufake70/myQt.git
 color 7
 pause > nul
 exit
