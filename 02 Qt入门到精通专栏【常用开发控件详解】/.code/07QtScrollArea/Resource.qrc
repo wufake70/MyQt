@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/new/img">
+        <file>tmd.png</file>
+    </qresource>
+</RCC>
