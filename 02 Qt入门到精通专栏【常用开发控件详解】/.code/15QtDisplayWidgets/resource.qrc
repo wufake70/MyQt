@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/new/prefix1">
+        <file>debug.png</file>
+        <file>main.cpp</file>
+    </qresource>
+</RCC>
