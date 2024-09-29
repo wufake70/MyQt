@@ -151,7 +151,7 @@ void  TextEdit::setAlign(int align)
 void  TextEdit::setListStyle(int style)
 {
     //
-    QTextCursor cursor = this->textCursor();
+    QTextCursor txt_cursor = this->textCursor();
     QTextListFormat::Style stylename = QTextListFormat::ListStyleUndefined;
     QTextFormat tfmt;
     switch (style) {
@@ -181,69 +181,89 @@ void  TextEdit::setListStyle(int style)
         break;
     }
 
-    cursor.beginEditBlock(); //指示文档上一组编辑操作的开始
-    QTextBlockFormat blockFmt = cursor.blockFormat();// 光标所在的块的格式
+    txt_cursor.beginEditBlock(); //指示文档上一组编辑操作的开始
+    QTextBlockFormat blockFmt = txt_cursor.blockFormat();// 光标所在的块的格式
     QTextListFormat listFmt;
 
-    if (cursor.currentList()) { // 当前光标是否存在列表样式
-        listFmt = cursor.currentList()->format();
-        if (style == 0) { // 无列表格式
-            QString txt = cursor.selectedText();
+    if (txt_cursor.currentList()) { // 当前光标是否存在列表样式
+        listFmt = txt_cursor.currentList()->format();
+    } else {
+        listFmt.setIndent(blockFmt.indent() + 1);
+    }
+    if (style == 0) { // 无列表格式
+        QString txt = txt_cursor.selectedText();
 
-            if(txt.isEmpty() || !txt.contains(0x2029)) // 0x2029换行符
-            {   // 单行格式化
-                cursor.select(QTextCursor::LineUnderCursor);
-                txt = cursor.selectedText();
-                cursor.movePosition(QTextCursor::EndOfLine);
-                cursor.movePosition(QTextCursor::Left,
-                                    QTextCursor::KeepAnchor,
-                                    txt.length()+1);  // del <ul>、\t
+        if(txt.isEmpty() || !txt.contains(0x2029)) // 0x2029换行符
+        {   // 单行格式化
+            txt_cursor.select(QTextCursor::LineUnderCursor);
+            txt = txt_cursor.selectedText();
+            txt_cursor.movePosition(QTextCursor::EndOfLine);
+            txt_cursor.movePosition(QTextCursor::Left,
+                                QTextCursor::KeepAnchor,
+                                txt.length()+1);  // del <ul>、\t
 
-                cursor.removeSelectedText();
+            txt = txt_cursor.selectedText();
+            txt_cursor.removeSelectedText();
+            if(!txt.isEmpty()){
+
                 QKeyEvent backspace(QEvent::KeyPress, Qt::Key_Backspace, Qt::NoModifier);
-                if(!txt.isEmpty()){
-                    cursor.insertText("\n");
-                    cursor.insertText(txt);
+                if(txt_cursor.position()!=0)
+                {
+                    txt_cursor.insertHtml("\u2029");
+                    txt_cursor.insertText(txt.remove(0,1));
+                }else {
+                    event(&backspace);
+                    event(&backspace);
+                    txt_cursor.insertText(txt);
                 }
-            }else{
-                int end = cursor.selectionEnd();
-                int start = cursor.selectionStart();
-                cursor.movePosition(QTextCursor::Start); // StartOfBlock、StartOfLine只能获取cursor起始位置所在行start位置
-                cursor.movePosition(QTextCursor::Right,QTextCursor::MoveAnchor,start);
-                cursor.movePosition(QTextCursor::StartOfLine);
-                start = cursor.position();
-                cursor.movePosition(QTextCursor::Start);
-                cursor.movePosition(QTextCursor::Right,QTextCursor::MoveAnchor,end);
-                cursor.movePosition(QTextCursor::EndOfLine);
-                end = cursor.position();
-                // 多行选中
-                cursor.movePosition(QTextCursor::Left, QTextCursor::KeepAnchor,
-                                    end-start+1);
-
-                setTextCursor(cursor);
-                txt = cursor.selectedText();
-                cursor.removeSelectedText();
-                cursor.insertHtml(txt);
-                // 在次选中
-                cursor.movePosition(QTextCursor::Left, QTextCursor::KeepAnchor,
-                                    end-start);
-                setTextCursor(cursor);
             }
-            cursor.endEditBlock();
-            return;
-        } else {
-            listFmt.setIndent(blockFmt.indent() + 1);
+        }else{
+            int end = txt_cursor.selectionEnd();
+            int start = txt_cursor.selectionStart();
+            txt_cursor.movePosition(QTextCursor::Start); // StartOfBlock、StartOfLine只能获取cursor起始位置所在行start位置
+            txt_cursor.movePosition(QTextCursor::Right,QTextCursor::MoveAnchor,start);
+            txt_cursor.movePosition(QTextCursor::StartOfLine);
+            start = txt_cursor.position();
+            txt_cursor.movePosition(QTextCursor::Start);
+            txt_cursor.movePosition(QTextCursor::Right,QTextCursor::MoveAnchor,end);
+            txt_cursor.movePosition(QTextCursor::EndOfLine);
+            end = txt_cursor.position();
+            // 多行选中
+            txt_cursor.movePosition(QTextCursor::Left, QTextCursor::KeepAnchor,
+                                end-start+1);
+
+            setTextCursor(txt_cursor);
+            txt = txt_cursor.selectedText();
+            txt_cursor.removeSelectedText();
+
+            QKeyEvent backspace(QEvent::KeyPress, Qt::Key_Backspace, Qt::NoModifier);
+            if(txt_cursor.position()!=0)
+            {
+                txt_cursor.insertHtml("\u2029");
+                txt.remove(0,1);
+            }else {
+                event(&backspace);
+                event(&backspace);
+            }
+            txt_cursor.insertText(txt);
+            // 在次选中
+            txt_cursor.movePosition(QTextCursor::Left, QTextCursor::KeepAnchor,
+//                                end-start);
+                                txt.length());
+            setTextCursor(txt_cursor);
         }
+        txt_cursor.endEditBlock();
+        return;
     } else {
         listFmt.setIndent(blockFmt.indent() + 1);
     }
 
     blockFmt.setIndent(0); //设置块的缩进
-    cursor.setBlockFormat(blockFmt);
+    txt_cursor.setBlockFormat(blockFmt);
 
     listFmt.setStyle(stylename);
-    cursor.createList(listFmt); // 更新列表格式
-    cursor.endEditBlock(); // 指示文档上一组编辑操作的结束，从撤消/重做的角度来看，该操作应该作为单个操作出现
+    txt_cursor.createList(listFmt); // 更新列表格式
+    txt_cursor.endEditBlock(); // 指示文档上一组编辑操作的结束，从撤消/重做的角度来看，该操作应该作为单个操作出现
 }
 
 void  TextEdit::documentIsModified()

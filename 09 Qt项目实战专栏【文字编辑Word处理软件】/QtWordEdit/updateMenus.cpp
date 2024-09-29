@@ -81,4 +81,5 @@ void MainWindow::updateStyleMenusStatus()
     fontChanged(tcfmt.font());
     colorChanged(pte->textColor());
     alignmentChanged(pte->alignment());
+    pte->textCursor().currentList();
 }
