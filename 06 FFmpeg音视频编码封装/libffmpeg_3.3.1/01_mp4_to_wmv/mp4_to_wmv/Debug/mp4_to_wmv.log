@@ -1,0 +1,4 @@
+﻿C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.CppBuild.targets(368,5): warning MSB8004: Output Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Output Directory.
+  mp4_to_wmv.cpp
+  mp4_to_wmv.vcxproj -> E:\Test\FFmpeg\libffmpeg_3.3.1\mp4_to_wmv\mp4_to_wmv\..\..\bin\x86\mp4_to_wmv.exe
+  mp4_to_wmv.vcxproj -> ..\..\bin\x86\mp4_to_wmv.pdb (Full PDB)
