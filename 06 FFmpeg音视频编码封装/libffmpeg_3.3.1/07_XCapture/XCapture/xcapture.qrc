@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/XCapture">
+        <file>screen.ico</file>
+        <file>record_normal.png</file>
+        <file>record_pressed.png</file>
+        <file>stop.png</file>
+        <file>record_hover.png</file>
+    </qresource>
+</RCC>

@@ -18,7 +18,7 @@ using namespace std;
 
 int main()
 {
-	char infile[] = "../../rgb_data.npy";
+	char infile[] = "../../test.rgb";
 	char outfile[] = "../../rgb.mp4";
 	// 注册 muxer, demuxer
 	av_register_all();
@@ -32,9 +32,9 @@ int main()
 		return -1;
 	}
 
-	int width = 1280;
-	int height = 720;
-	int fps = 24;
+	int width = 1920;
+	int height = 1080;
+	int fps = 20;
 
 	// 获取 h264编码器
 	AVCodec *codec = avcodec_find_encoder(AV_CODEC_ID_H264);
@@ -89,7 +89,7 @@ int main()
 	// rgba -> yuv
 	SwsContext *pSwsctx = NULL;
 	pSwsctx = sws_getCachedContext(pSwsctx,
-		width, height, AV_PIX_FMT_RGBA,	// 输入的像素格式
+		width, height, AV_PIX_FMT_BGRA,	// 输入的像素格式
 		width, height, AV_PIX_FMT_YUV420P,// 输出
 		SWS_BICUBIC, // 算法
 		NULL, NULL, NULL);
@@ -121,11 +121,49 @@ int main()
 	}
 
 	int64_t timestamp = 0;
+	int32_t lossframe = 1;
 	while (1)
 	{
 		int len = fread(rgba, 1, width*height * 4, fp);
 		if (len <= 0) break;
 
+		uint8_t *indata[AV_NUM_DATA_POINTERS] = { 0 };
+		indata[0] = rgba;
+		int inlinesize[AV_NUM_DATA_POINTERS] = { 0 };
+		inlinesize[0] = width * 4;
+		// 开始 rgba -> yuv
+		ret = sws_scale(pSwsctx, indata, inlinesize, 0, height,
+			yuvFrame->data, yuvFrame->linesize); // stride
+		if (ret < 0) break;
+
+		// 开始h264编码并写入输出文件
+		yuvFrame->pts = timestamp;
+		//timestamp += 3600;
+		timestamp += pOavfc->streams[0]->time_base.den / fps;
+
+		ret = avcodec_send_frame(pAvCodecCtx, yuvFrame); // 将yuv数据交给编码器进行多线程编码
+		if (ret != 0)
+		{
+			lossframe++;
+			continue;
+		}
+		AVPacket pkt;
+		av_init_packet(&pkt);
+		ret = avcodec_receive_packet(pAvCodecCtx, &pkt); // 接收编码后的packet数据包
+		if (ret != 0) {
+			lossframe++;
+			continue;
+		}
+		cout << "<" << pkt.size << ">";
+
+		//av_write_frame(pOavfc, &pkt);
+		//av_packet_unref(&pkt);
+		av_interleaved_write_frame(pOavfc, &pkt); // 自动释放pkt
+	}
+
+	// 写入缓冲区的剩余数据帧
+	while(--lossframe>0)
+	{
 		uint8_t *indata[AV_NUM_DATA_POINTERS] = { 0 };
 		indata[0] = rgba;
 		int inlinesize[AV_NUM_DATA_POINTERS] = { 0 };
@@ -147,7 +185,7 @@ int main()
 		ret = avcodec_receive_packet(pAvCodecCtx, &pkt); // 接收编码后的packet数据包
 		if (ret != 0) continue;
 
-		cout << "<" << pkt.size << ">";
+		cout << "(" << pkt.size << ")";
 
 		//av_write_frame(pOavfc, &pkt);
 		//av_packet_unref(&pkt);

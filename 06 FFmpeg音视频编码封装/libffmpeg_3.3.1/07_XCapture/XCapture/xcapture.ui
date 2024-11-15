@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>XCaptureClass</class>
+ <widget class="QWidget" name="XCaptureClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>383</width>
+    <height>91</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>XCapture</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="xcapture.qrc">
+    <normaloff>:/XCapture/screen.ico</normaloff>
+    <normalon>:/XCapture/screen.ico</normalon>
+    <disabledoff>:/XCapture/screen.ico</disabledoff>
+    <disabledon>:/XCapture/screen.ico</disabledon>
+    <activeoff>:/XCapture/screen.ico</activeoff>
+    <activeon>:/XCapture/screen.ico</activeon>
+    <selectedoff>:/XCapture/screen.ico</selectedoff>
+    <selectedon>:/XCapture/screen.ico</selectedon>:/XCapture/screen.ico</iconset>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">#XCaptureClass {
+    background: rgb(240, 240, 240);
+}
+
+</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QGridLayout" name="gridLayout_2">
+     <item row="0" column="0" colspan="2">
+      <widget class="QLineEdit" name="path_edit"/>
+     </item>
+     <item row="0" column="2">
+      <widget class="QPushButton" name="path_select">
+       <property name="text">
+        <string>选择输出路径</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QPushButton" name="control_btn">
+       <property name="text">
+        <string>开始</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLabel" name="timer_show">
+       <property name="toolTip">
+        <string>计时器</string>
+       </property>
+       <property name="text">
+        <string>00:00</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="resolution_show">
+       <property name="toolTip">
+        <string>分辨率</string>
+       </property>
+       <property name="text">
+        <string>1920x1080</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources>
+  <include location="xcapture.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>control_btn</sender>
+   <signal>clicked()</signal>
+   <receiver>XCaptureClass</receiver>
+   <slot>control_btn_onclicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>319</x>
+     <y>64</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>855</x>
+     <y>-230</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>path_select</sender>
+   <signal>clicked()</signal>
+   <receiver>XCaptureClass</receiver>
+   <slot>path_select_onclicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>289</x>
+     <y>28</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>882</x>
+     <y>-240</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>path_select_onclicked()</slot>
+  <slot>control_btn_onclicked()</slot>
+ </slots>
+</ui>
